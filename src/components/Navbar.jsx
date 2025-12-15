@@ -129,14 +129,25 @@ const Navbar = () => {
 
   return (
     <nav 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+      className={`sticky top-0 left-0 w-full z-50 transition-all duration-500 px-4 ${
         scrolled 
-          ? "py-3 shadow-lg shadow-accent/5" 
+          ? "py-3" 
           : "py-5"
       }`}
     >
       {/* Glassmorphism background */}
-      <div className="absolute inset-0 bg-primary/70 backdrop-blur-xl border-b border-border-primary/50" />
+      <div 
+        className={`absolute inset-0 bg-primary/70 backdrop-blur-xl border border-border-primary/50 transition-all duration-500 ${
+          scrolled 
+            ? "mx-4 my-2 rounded-2xl shadow-lg shadow-accent/5"
+            : "mx-0 my-0 rounded-none border-b border-t-0 border-x-0"
+        }`}
+        style={{
+          clipPath: scrolled 
+            ? "polygon(0 0, 100% 0, 100% 100%, 0 100%)"
+            : "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)"
+        }}
+      />
       
       {/* Canvas de fondo */}
       <canvas 
@@ -209,7 +220,7 @@ const Navbar = () => {
               <a
                 href="/CV_Toledo_Franco_Nicolas.pdf"
                 download
-                className="group relative ml-4 px-5 py-2 bg-accent text-white text-sm font-medium rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent/50"
+                className="group relative ml-4 px-5 py-2.5 bg-accent text-white text-sm font-medium rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent/50 flex items-center gap-2"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <Download className="w-4 h-4 group-hover:animate-bounce" />
