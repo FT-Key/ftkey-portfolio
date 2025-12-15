@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+import { ExternalLink, Github, Sparkles, Code2, Zap, Database } from "lucide-react";
 import tetrisImg from "../assets/images/projects/project1-tetris.webp";
 import rollingVetImg from "../assets/images/projects/project2-rollingvet.webp";
 import keyAiImg from "../assets/images/projects/project3-KeyAI.webp";
@@ -9,6 +11,9 @@ const projects = [
     image: tetrisImg,
     github: "https://github.com/FT-Key/TetrisCanvas",
     demo: "https://tetriscanvas.netlify.app/",
+    tags: ["JavaScript", "Canvas", "Game"],
+    color: "from-yellow-500 to-orange-500",
+    icon: Code2
   },
   {
     title: "RollingVet",
@@ -16,6 +21,9 @@ const projects = [
     image: rollingVetImg,
     github: "https://github.com/FT-Key/RollingVet",
     demo: "https://rollingvet104i.netlify.app/",
+    tags: ["React", "Node.js", "MongoDB"],
+    color: "from-green-500 to-emerald-500",
+    icon: Database
   },
   {
     title: "KeyAI",
@@ -23,62 +31,313 @@ const projects = [
     image: keyAiImg,
     github: "https://github.com/FT-Key/KeyAI",
     demo: "https://keyai.netlify.app/",
+    tags: ["AI", "API", "DeepSeek"],
+    color: "from-purple-500 to-pink-500",
+    icon: Zap
   },
 ];
 
 const Projects = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [hoveredProject, setHoveredProject] = useState(null);
+  const sectionRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
+  // Canvas con efecto de código matrix
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    const columns = Math.floor(canvas.width / 20);
+    const drops = Array(columns).fill(0);
+    const chars = "01";
+
+    function draw() {
+      ctx.fillStyle = "rgba(var(--color-bg-primary), 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "rgba(99, 102, 241, 0.5)";
+      ctx.font = "15px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(text, i * 20, drops[i] * 20);
+
+        if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    const interval = setInterval(draw, 50);
+
+    const handleResize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
-    <section id="proyectos" className="py-24 px-6 bg-gray-900">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-16">
-          Proyectos destacados
-        </h2>
+    <section 
+      ref={sectionRef}
+      id="proyectos" 
+      className="relative py-32 px-6 bg-secondary overflow-hidden"
+    >
+      {/* Canvas de fondo */}
+      <canvas 
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full opacity-10 pointer-events-none"
+      />
 
-        <div className="grid gap-10 md:grid-cols-3">
-          {projects.map((project) => (
-            <article
-              key={project.title}
-              className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden hover:border-indigo-500 hover:-translate-y-1 transition-all"
-            >
-              {/* Imagen */}
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-40 object-cover"
-              />
+      {/* Gradientes decorativos */}
+      <div className="absolute top-1/4 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
 
-              {/* Contenido */}
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">
-                  {project.title}
-                </h3>
+      {/* Formas geométricas */}
+      <div className="absolute top-20 right-20 w-40 h-40 border border-accent/10 rounded-3xl rotate-12 animate-float" />
+      <div className="absolute bottom-40 left-20 w-32 h-32 border border-accent/10 rotate-45 animate-float-delayed" style={{ borderRadius: "30%" }} />
 
-                <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-                  {project.description}
-                </p>
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Título */}
+        <div className="text-center mb-20">
+          <div 
+            className={`inline-flex items-center gap-2 mb-6 transition-all duration-700 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
+            <Sparkles className="w-5 h-5 text-accent animate-pulse" />
+            <span className="text-sm uppercase tracking-[0.3em] text-accent font-bold">
+              Portfolio
+            </span>
+            <Sparkles className="w-5 h-5 text-accent animate-pulse" style={{ animationDelay: "0.5s" }} />
+          </div>
+          
+          <h2 
+            className={`text-5xl md:text-6xl font-bold mb-6 transition-all duration-700 delay-100 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
+            <span className="bg-gradient-to-r from-text-primary via-accent to-text-primary bg-clip-text text-transparent animate-gradient-x">
+              Proyectos destacados
+            </span>
+          </h2>
+          
+          <p 
+            className={`text-secondary text-lg max-w-2xl mx-auto mb-8 transition-all duration-700 delay-200 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
+            Soluciones innovadoras construidas con las últimas tecnologías
+          </p>
+        </div>
 
-                <div className="flex gap-4">
-                  <a
-                    href={project.demo}
-                    target="_blank"
-                    className="text-sm font-medium text-indigo-400 hover:underline"
-                  >
-                    Ver demo →
-                  </a>
+        {/* Grid de proyectos */}
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project, index) => {
+            const Icon = project.icon;
+            return (
+              <article
+                key={project.title}
+                className={`group relative transition-all duration-700 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+                }`}
+                style={{ transitionDelay: `${index * 0.15}s` }}
+                onMouseEnter={() => setHoveredProject(index)}
+                onMouseLeave={() => setHoveredProject(null)}
+              >
+                {/* Card principal */}
+                <div className="relative h-full bg-primary border border-border-primary rounded-2xl overflow-hidden transition-all duration-500 hover:border-accent/50 hover:-translate-y-2">
+                  
+                  {/* Imagen con overlay */}
+                  <div className="relative h-56 overflow-hidden">
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    
+                    {/* Overlay con gradiente */}
+                    <div className={`absolute inset-0 bg-gradient-to-t ${project.color} opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
+                    
+                    {/* Icono flotante */}
+                    <div className={`absolute top-4 right-4 p-3 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg transition-all duration-500 ${
+                      hoveredProject === index ? "scale-100 rotate-0" : "scale-0 rotate-180"
+                    }`}>
+                      <Icon className={`w-6 h-6 bg-gradient-to-br ${project.color} bg-clip-text text-transparent`} />
+                    </div>
 
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    className="text-sm text-gray-400 hover:text-indigo-400 transition"
-                  >
-                    GitHub
-                  </a>
+                    {/* Efecto de brillo */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  </div>
+
+                  {/* Contenido */}
+                  <div className="p-6 space-y-4">
+                    {/* Título */}
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-2xl font-bold text-primary group-hover:text-accent transition-colors duration-300">
+                        {project.title}
+                      </h3>
+                      <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${project.color} opacity-20 group-hover:opacity-100 group-hover:scale-125 transition-all duration-500`} />
+                    </div>
+
+                    {/* Descripción */}
+                    <p className="text-secondary leading-relaxed min-h-[3rem]">
+                      {project.description}
+                    </p>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map(tag => (
+                        <span 
+                          key={tag}
+                          className={`px-3 py-1 text-xs font-medium bg-secondary border border-border-secondary text-tertiary rounded-full transition-all duration-300 hover:border-accent hover:text-accent hover:scale-105`}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Divider */}
+                    <div className="h-px bg-border-primary" />
+
+                    {/* Botones de acción */}
+                    <div className="flex gap-3">
+                      <a
+                        href={project.demo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r ${project.color} text-white font-medium rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105`}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span>Demo</span>
+                      </a>
+
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-border-primary text-secondary hover:border-accent hover:text-accent font-medium rounded-lg transition-all duration-300 hover:scale-105"
+                      >
+                        <Github className="w-4 h-4" />
+                        <span>Code</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Efecto de esquina */}
+                  <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden">
+                    <div className={`absolute top-0 right-0 w-0 h-0 border-t-[50px] border-r-[50px] border-t-transparent transition-all duration-500 ${
+                      hoveredProject === index ? "border-r-accent/20" : "border-r-transparent"
+                    }`} />
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+
+                {/* Sombra externa dinámica */}
+                <div className={`absolute -inset-1 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500 -z-10 rounded-2xl`} />
+
+                {/* Número decorativo */}
+                <div className={`absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br ${project.color} flex items-center justify-center text-white font-black text-lg shadow-lg transition-all duration-500 ${
+                  hoveredProject === index ? "scale-110 rotate-12" : "scale-100 rotate-0"
+                }`}>
+                  {index + 1}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* CTA final */}
+        <div 
+          className={`mt-20 text-center transition-all duration-700 delay-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
+          <p className="text-secondary text-lg mb-6">
+            ¿Interesado en trabajar juntos?
+          </p>
+          <a
+            href="#contacto"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-medium rounded-xl hover:bg-accent-hover transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent/50"
+          >
+            <span>Hablemos de tu proyecto</span>
+            <ExternalLink className="w-5 h-5" />
+          </a>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes gradient-x {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) rotate(12deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(12deg);
+          }
+        }
+
+        @keyframes float-delayed {
+          0%, 100% {
+            transform: translateY(0) rotate(45deg);
+          }
+          50% {
+            transform: translateY(-15px) rotate(45deg);
+          }
+        }
+
+        .animate-gradient-x {
+          background-size: 200% 200%;
+          animation: gradient-x 3s ease infinite;
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-float-delayed {
+          animation: float-delayed 7s ease-in-out infinite 1s;
+        }
+      `}</style>
     </section>
   );
 };
