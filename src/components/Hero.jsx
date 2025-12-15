@@ -196,11 +196,11 @@ const Hero = () => {
           {/* Título principal */}
           <div className="mb-8 space-y-4">
             <h1 
-              className="text-6xl md:text-8xl font-black leading-none animate-fade-in"
+              className="text-6xl md:text-8xl font-black leading-none animate-fade-in relative z-20"
               style={{ animationDelay: "0.2s" }}
             >
-              <span className="text-primary block mb-2">Franco</span>
-              <span className="bg-gradient-to-r from-accent via-accent-hover to-accent bg-clip-text text-transparent animate-gradient-x">
+              <span className="text-primary block mb-2">Franco Nicolás</span>
+              <span className="text-accent block">
                 Toledo
               </span>
             </h1>
@@ -293,9 +293,9 @@ const Hero = () => {
             style={{ animationDelay: "0.8s" }}
           >
             {[
-              { number: "50+", label: "Proyectos" },
-              { number: "25+", label: "Tecnologías" },
-              { number: "6+", label: "Años" }
+              { number: "3+", label: "Proyectos" },
+              { number: "6+", label: "Tecnologías" },
+              { number: "2+", label: "Años" }
             ].map((stat, index) => (
               <div key={index} className="group">
                 <div className="flex items-baseline gap-2">
