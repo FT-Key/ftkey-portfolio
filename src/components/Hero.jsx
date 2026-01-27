@@ -293,9 +293,9 @@ const Hero = () => {
             style={{ animationDelay: "0.8s" }}
           >
             {[
-              { number: "3+", label: "Proyectos" },
-              { number: "6+", label: "Tecnologías" },
-              { number: "2+", label: "Años" }
+              { number: "12+", label: "Proyectos" },
+              { number: "20+", label: "Tecnologías" },
+              { number: "7+", label: "Años" }
             ].map((stat, index) => (
               <div key={index} className="group">
                 <div className="flex items-baseline gap-2">

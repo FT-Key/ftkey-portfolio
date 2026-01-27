@@ -1,40 +1,138 @@
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink, Github, Sparkles, Code2, Zap, Database } from "lucide-react";
-import tetrisImg from "../assets/images/projects/project1-tetris.webp";
-import rollingVetImg from "../assets/images/projects/project2-rollingvet.webp";
-import keyAiImg from "../assets/images/projects/project3-KeyAI.webp";
+import rollingCodeSchoolImg from "../assets/images/projects/RollingCodeSchool.webp";
+import rollingCodeStudioImg from "../assets/images/projects/RollingCodeStudio.webp";
+import hexagonizerImg from "../assets/images/projects/Hexagonizer.webp";
+import antFormBuilderImg from "../assets/images/projects/AntFormBuilder.webp";
+import ravelloImg from "../assets/images/projects/RavelloTurismo.webp";
+import centerGymImg from "../assets/images/projects/CenterGym.webp";
+import techSolutionsImg from "../assets/images/projects/TechSolutions.webp";
+import rollingVetImg from "../assets/images/projects/Rollingvet.webp";
+import zabanaImg from "../assets/images/projects/Obsidian-Zabina.webp";
+import keyAiImg from "../assets/images/projects/KeyAI.webp";
+import tetrisImg from "../assets/images/projects/Tetris.webp";
 
 const projects = [
   {
-    title: "Tetris Game",
-    description: "Juego interactivo creado con JavaScript y Canvas.",
-    image: tetrisImg,
-    github: "https://github.com/FT-Key/TetrisCanvas",
-    demo: "https://tetriscanvas.netlify.app/",
-    tags: ["JavaScript", "Canvas", "Game"],
-    color: "from-yellow-500 to-orange-500",
+    title: "RollingCode School (Universe)",
+    description: "Sistema de gestión académica para plataforma educativa de programación con administración de usuarios y cursos.",
+    image: rollingCodeSchoolImg,
+    github: "",
+    demo: "https://universe.rollingcodeschool.com/",
+    tags: ["React", "Ant Design", "Management System", "Education", "Enterprise"],
+    color: "from-indigo-600 to-indigo-800",
+    icon: Database
+  },
+  {
+    title: "RollingCode Studio",
+    description: "Landing page corporativa para agencia de desarrollo de software con diseño moderno y responsive.",
+    image: rollingCodeStudioImg,
+    github: "",
+    demo: "https://rollingcodestudio.com/",
+    tags: ["NextJS", "TailwindCSS", "Landing Page", "Enterprise", "SEO"],
+    color: "from-slate-700 to-indigo-600",
     icon: Code2
   },
   {
+    title: "Hexagonizer",
+    description: "CLI tool para generar proyectos con arquitectura hexagonal, entidades y CRUD automático.",
+    image: hexagonizerImg,
+    github: "",
+    demo: "https://www.npmjs.com/package/hexagonizer",
+    tags: ["Node.js", "CLI", "Hexagonal Architecture", "NPM", "Code Generator", "TypeScript"],
+    color: "from-zinc-800 to-slate-900",
+    icon: Zap
+  },
+  {
+    title: "Ant Form Builder",
+    description: "Herramienta para creación dinámica de formularios personalizados con IA y preview en tiempo real.",
+    image: antFormBuilderImg,
+    github: "https://github.com/FT-Key/ant-form-builder",
+    demo: "https://ant-form-builder.vercel.app/",
+    tags: ["React", "Ant Design", "AI", "Forms", "Development Tools", "TypeScript"],
+    color: "from-indigo-500 to-purple-600",
+    icon: Code2
+  },
+  {
+    title: "Ravello Turismo",
+    description: "E-commerce de paquetes turísticos con integración de MercadoPago y gestión de reservas.",
+    image: ravelloImg,
+    github: "https://github.com/FT-Key/Ravello-web",
+    demo: "https://ravello.netlify.app/",
+    tags: ["NextJS", "Firebase", "TailwindCSS", "eCommerce", "MercadoPago", "Business"],
+    color: "from-emerald-500 to-teal-600",
+    icon: Database
+  },
+  {
+    title: "Center Gym",
+    description: "Plataforma completa de gestión para centro fitness con Firebase Storage y panel administrativo.",
+    image: centerGymImg,
+    github: "https://github.com/FT-Key/center-gym",
+    demo: "https://center-gym.vercel.app/",
+    tags: ["NextJS", "React", "Firebase", "TailwindCSS", "Vercel", "Management"],
+    color: "from-orange-500 to-red-600",
+    icon: Zap
+  },
+  {
+    title: "Tech Solutions",
+    description: "Landing page para empresa de soluciones tecnológicas con diseño moderno y responsive.",
+    image: techSolutionsImg,
+    github: "https://github.com/FT-Key/TechSolutions",
+    demo: "https://center-gym.vercel.app/",
+    tags: ["NextJS", "React", "Firebase", "TailwindCSS", "Vercel", "Management"],
+    color: "from-orange-500 to-red-600",
+    icon: Zap
+  },
+  {
     title: "RollingVet",
-    description: "Web app de veterinaria con React, Node y MongoDB.",
+    description: "Aplicación web full-stack para gestión veterinaria con autenticación y CRUD completo.",
     image: rollingVetImg,
     github: "https://github.com/FT-Key/RollingVet",
     demo: "https://rollingvet104i.netlify.app/",
-    tags: ["React", "Node.js", "MongoDB"],
-    color: "from-green-500 to-emerald-500",
+    tags: ["React", "Node.js", "MongoDB", "Express", "Full-Stack", "REST API"],
+    color: "from-green-600 to-emerald-700",
+    icon: Database
+  },
+  {
+    title: "Obsidian/Zabina",
+    description: "E-commerce de moda y servicios de manicura con carrito de compras y gestión de inventario.",
+    image: zabanaImg,
+    github: "https://github.com/FT-Key/obsidian",
+    demo: "https://obsidian-murex.vercel.app/",
+    tags: ["NextJS", "Firebase", "TailwindCSS", "eCommerce", "Vercel", "Fashion"],
+    color: "from-pink-600 to-rose-700",
     icon: Database
   },
   {
     title: "KeyAI",
-    description: "Chat con IA usando APIs y modelo DeepSeek.",
+    description: "Chat interactivo con inteligencia artificial usando modelo DeepSeek y gestión de conversaciones.",
     image: keyAiImg,
     github: "https://github.com/FT-Key/KeyAI",
     demo: "https://keyai.netlify.app/",
-    tags: ["AI", "API", "DeepSeek"],
-    color: "from-purple-500 to-pink-500",
+    tags: ["React", "AI", "API Integration", "DeepSeek", "Chat", "JavaScript"],
+    color: "from-purple-600 to-fuchsia-700",
     icon: Zap
   },
+  {
+    title: "Akarumi Yume",
+    description: "Landing page para e-commerce de productos anime con catálogo y diseño temático japonés.",
+    image: keyAiImg,
+    github: "https://github.com/FT-Key/Akarumi-Yume",
+    demo: "https://akarumi-yume.vercel.app/",
+    tags: ["React", "NextJS", "TailwindCSS", "Landing Page", "eCommerce", "Design"],
+    color: "from-violet-600 to-indigo-700",
+    icon: Code2
+  },
+  {
+    title: "Tetris Game",
+    description: "Juego clásico de Tetris con controles fluidos y sistema de puntuación usando Canvas API.",
+    image: tetrisImg,
+    github: "https://github.com/FT-Key/TetrisCanvas",
+    demo: "https://tetriscanvas.netlify.app/",
+    tags: ["JavaScript", "Canvas API", "Game Development", "Vanilla JS", "DOM"],
+    color: "from-amber-500 to-orange-600",
+    icon: Code2
+  }
 ];
 
 const Projects = () => {
@@ -177,11 +275,11 @@ const Projects = () => {
                 onMouseEnter={() => setHoveredProject(index)}
                 onMouseLeave={() => setHoveredProject(null)}
               >
-                {/* Card principal */}
-                <div className="relative h-full bg-primary border border-border-primary rounded-2xl overflow-hidden transition-all duration-500 hover:border-accent/50 hover:-translate-y-2">
+                {/* Card principal con altura fija y flex */}
+                <div className="relative h-full flex flex-col bg-primary border border-border-primary rounded-2xl overflow-hidden transition-all duration-500 hover:border-accent/50 hover:-translate-y-2">
                   
-                  {/* Imagen con overlay */}
-                  <div className="relative h-56 overflow-hidden">
+                  {/* Imagen con overlay - altura fija */}
+                  <div className="relative h-56 flex-shrink-0 overflow-hidden">
                     <img
                       src={project.image}
                       alt={project.title}
@@ -202,37 +300,40 @@ const Projects = () => {
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   </div>
 
-                  {/* Contenido */}
-                  <div className="p-6 space-y-4">
-                    {/* Título */}
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-2xl font-bold text-primary group-hover:text-accent transition-colors duration-300">
+                  {/* Contenido - flex grow para ocupar espacio disponible */}
+                  <div className="flex-1 flex flex-col p-6">
+                    {/* Título - altura fija */}
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <h3 className="text-2xl font-bold text-primary group-hover:text-accent transition-colors duration-300 line-clamp-2">
                         {project.title}
                       </h3>
-                      <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${project.color} opacity-20 group-hover:opacity-100 group-hover:scale-125 transition-all duration-500`} />
+                      <div className={`w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br ${project.color} opacity-20 group-hover:opacity-100 group-hover:scale-125 transition-all duration-500`} />
                     </div>
 
-                    {/* Descripción */}
-                    <p className="text-secondary leading-relaxed min-h-[3rem]">
+                    {/* Descripción - altura fija con line-clamp */}
+                    <p className="text-secondary leading-relaxed mb-4 line-clamp-3 h-[4.5rem]">
                       {project.description}
                     </p>
 
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2">
+                    {/* Tags - altura mínima fija */}
+                    <div className="flex flex-wrap gap-2 mb-4 min-h-[3.5rem]">
                       {project.tags.map(tag => (
                         <span 
                           key={tag}
-                          className={`px-3 py-1 text-xs font-medium bg-secondary border border-border-secondary text-tertiary rounded-full transition-all duration-300 hover:border-accent hover:text-accent hover:scale-105`}
+                          className={`px-3 py-1 text-xs font-medium bg-secondary border border-border-secondary text-tertiary rounded-full transition-all duration-300 hover:border-accent hover:text-accent hover:scale-105 h-fit`}
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
 
-                    {/* Divider */}
-                    <div className="h-px bg-border-primary" />
+                    {/* Spacer que empuja los botones al fondo */}
+                    <div className="flex-1" />
 
-                    {/* Botones de acción */}
+                    {/* Divider */}
+                    <div className="h-px bg-border-primary mb-4" />
+
+                    {/* Botones de acción - siempre en el fondo */}
                     <div className="flex gap-3">
                       <a
                         href={project.demo}
@@ -244,15 +345,17 @@ const Projects = () => {
                         <span>Demo</span>
                       </a>
 
-                      <a
-                        href={project.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-border-primary text-secondary hover:border-accent hover:text-accent font-medium rounded-lg transition-all duration-300 hover:scale-105"
-                      >
-                        <Github className="w-4 h-4" />
-                        <span>Code</span>
-                      </a>
+                      {project.github && (
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-border-primary text-secondary hover:border-accent hover:text-accent font-medium rounded-lg transition-all duration-300 hover:scale-105"
+                        >
+                          <Github className="w-4 h-4" />
+                          <span>Code</span>
+                        </a>
+                      )}
                     </div>
                   </div>
 
