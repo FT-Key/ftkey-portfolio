@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink, Github, Sparkles, Code2, Zap, Database } from "lucide-react";
+import gsap from "gsap";
 import rollingCodeSchoolImg from "../assets/images/projects/RollingCodeSchool.webp";
 import rollingCodeStudioImg from "../assets/images/projects/RollingCodeStudio.webp";
 import hexagonizerImg from "../assets/images/projects/Hexagonizer.webp";
@@ -80,7 +81,7 @@ const projects = [
     github: "https://github.com/FT-Key/TechSolutions",
     demo: "https://center-gym.vercel.app/",
     tags: ["NextJS", "React", "Firebase", "TailwindCSS", "Vercel", "Management"],
-    color: "from-orange-500 to-red-600",
+    color: "from-blue-500 to-cyan-600",
     icon: Zap
   },
   {
@@ -135,76 +136,328 @@ const projects = [
   }
 ];
 
-const Projects = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [hoveredProject, setHoveredProject] = useState(null);
-  const sectionRef = useRef(null);
-  const canvasRef = useRef(null);
+// Componente de imagen lazy optimizado - MEJORADO
+const LazyImage = ({ src, alt, className }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [isInView, setIsInView] = useState(false);
+  const imgRef = useRef(null);
 
   useEffect(() => {
+    const img = imgRef.current;
+    if (!img) return;
+
+    // Crear una imagen para precargar
+    const preloadImg = new Image();
+    
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !imageSrc) {
+            // Precargar la imagen
+            preloadImg.onload = () => {
+              setImageSrc(src);
+              setIsInView(true);
+            };
+            preloadImg.onerror = () => {
+              setImageSrc(src); // Mostrar aunque falle
+              setIsInView(true);
+            };
+            preloadImg.src = src;
+            observer.unobserve(img);
+          }
+        });
       },
-      { threshold: 0.1 }
+      { 
+        rootMargin: "200px", // Precargar 200px antes de entrar en viewport
+        threshold: 0
+      }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    observer.observe(img);
+    return () => observer.disconnect();
+  }, [src, imageSrc]);
+
+  return (
+    <div ref={imgRef} className="relative w-full h-full overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900">
+      {!isLoaded && (
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 animate-pulse" />
+      )}
+      {imageSrc && (
+        <img
+          src={imageSrc}
+          alt={alt}
+          className={`${className} transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+          onLoad={() => setIsLoaded(true)}
+          loading="lazy"
+          decoding="async"
+        />
+      )}
+    </div>
+  );
+};
+
+const Projects = () => {
+  const [hoveredProject, setHoveredProject] = useState(null);
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const badgeRef = useRef(null);
+  const cardsRef = useRef([]);
+  const canvasRef = useRef(null);
+
+  // Precargar imágenes
+  useEffect(() => {
+    const imagesToPreload = [
+      rollingCodeSchoolImg,
+      rollingCodeStudioImg,
+      hexagonizerImg,
+      antFormBuilderImg,
+      ravelloImg,
+      centerGymImg,
+      techSolutionsImg,
+      rollingVetImg,
+      zabanaImg,
+      keyAiImg,
+      tetrisImg
+    ];
+
+    imagesToPreload.forEach((imgSrc) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = imgSrc;
+      document.head.appendChild(link);
+    });
+  }, []);
+
+  // Animación inicial del header
+  useEffect(() => {
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    
+    // Badge con efecto elástico
+    tl.from(badgeRef.current, {
+      opacity: 0,
+      scale: 0,
+      rotation: -180,
+      duration: 1.2,
+      ease: "elastic.out(1, 0.5)",
+    });
+
+    // Título con efecto de elevación
+    tl.from(titleRef.current, {
+      opacity: 0,
+      y: 80,
+      rotationX: -45,
+      transformOrigin: "50% 50%",
+      duration: 1,
+      ease: "back.out(1.7)",
+    }, "-=0.6");
+
+    // Subtítulo con fade suave
+    tl.from(subtitleRef.current, {
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+    }, "-=0.4");
+  }, []);
+
+  // Animaciones de las cards con Intersection Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const card = entry.target;
+            const index = cardsRef.current.indexOf(card);
+            // Animación de entrada
+            gsap.from(card, {
+              opacity: 0,
+              y: 100,
+              rotationY: 45,
+              scale: 0.8,
+              duration: 1.2,
+              delay: (index % 3) * 0.15,
+              ease: "power4.out",
+            });
+            observer.unobserve(card);
+          }
+        });
+      },
+      { rootMargin: "100px" }
+    );
+
+    cardsRef.current.forEach((card) => {
+      if (card) observer.observe(card);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Efecto parallax 3D en hover
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      cardsRef.current.forEach((card) => {
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (centerY - y) / 25;
+        const rotateY = (x - centerX) / 25;
+
+        gsap.to(card, {
+          rotationX: rotateX,
+          rotationY: rotateY,
+          duration: 0.5,
+          ease: "power2.out",
+          transformPerspective: 1000,
+        });
+      });
+    };
+
+    const handleMouseLeave = () => {
+      cardsRef.current.forEach((card) => {
+        if (!card) return;
+        gsap.to(card, {
+          rotationX: 0,
+          rotationY: 0,
+          duration: 0.5,
+          ease: "power2.out",
+        });
+      });
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, []);
 
-  // Canvas con efecto de código matrix
+  // Canvas con sistema de partículas mejorado - OPTIMIZADO
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+    
+    let animationFrameId;
+    let frameCount = 0;
+    
+    const setCanvasSize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = canvas.offsetWidth + 'px';
+      canvas.style.height = canvas.offsetHeight + 'px';
+    };
+    
+    setCanvasSize();
 
-    const columns = Math.floor(canvas.width / 20);
-    const drops = Array(columns).fill(0);
-    const chars = "01";
+    const particles = [];
+    const particleCount = Math.min(35, Math.floor((canvas.offsetWidth * canvas.offsetHeight) / 20000)); // Reducido para mejor performance
 
-    function draw() {
-      ctx.fillStyle = "rgba(var(--color-bg-primary), 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "rgba(99, 102, 241, 0.5)";
-      ctx.font = "15px monospace";
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-        ctx.fillText(text, i * 20, drops[i] * 20);
-
-        if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * canvas.offsetWidth,
+        y: Math.random() * canvas.offsetHeight,
+        vx: (Math.random() - 0.5) * 0.5, // Reducida velocidad
+        vy: (Math.random() - 0.5) * 0.5,
+        size: Math.random() * 1.5 + 0.5, // Partículas más pequeñas
+        opacity: Math.random() * 0.3 + 0.1
+      });
     }
 
-    const interval = setInterval(draw, 50);
+    function animate() {
+      frameCount++;
+      
+      // Actualizar solo cada 2 frames para mejor performance
+      if (frameCount % 2 === 0) {
+        ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+
+        particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > canvas.offsetWidth) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.offsetHeight) p.vy *= -1;
+
+          ctx.fillStyle = `rgba(99, 102, 241, ${p.opacity})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Conectar partículas cercanas - optimizado
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distSq = dx * dx + dy * dy;
+            const maxDist = 100;
+
+            if (distSq < maxDist * maxDist) {
+              const distance = Math.sqrt(distSq);
+              const opacity = 0.2 * (1 - distance / maxDist);
+              ctx.strokeStyle = `rgba(99, 102, 241, ${opacity})`;
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    animate();
 
     const handleResize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      setCanvasSize();
     };
 
     window.addEventListener("resize", handleResize);
+    
     return () => {
-      clearInterval(interval);
+      cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
     };
+  }, []);
+
+  // Animación del CTA con Intersection Observer
+  useEffect(() => {
+    const ctaSection = document.querySelector(".cta-section");
+    if (!ctaSection) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            gsap.from(entry.target, {
+              opacity: 0,
+              scale: 0.9,
+              y: 50,
+              duration: 1,
+              ease: "back.out(1.7)",
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: "100px" }
+    );
+
+    observer.observe(ctaSection);
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -213,28 +466,25 @@ const Projects = () => {
       id="proyectos" 
       className="relative py-32 px-6 bg-secondary overflow-hidden"
     >
-      {/* Canvas de fondo */}
+      {/* Canvas de fondo optimizado */}
       <canvas 
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full opacity-10 pointer-events-none"
+        className="absolute inset-0 w-full h-full opacity-20 pointer-events-none"
+        style={{ willChange: 'transform' }}
       />
 
-      {/* Gradientes decorativos */}
-      <div className="absolute top-1/4 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      {/* Gradientes decorativos animados */}
+      <div className="absolute top-1/4 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-float-slow" />
+      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-float-slow-delayed" />
 
-      {/* Formas geométricas */}
+      {/* Formas geométricas decorativas */}
       <div className="absolute top-20 right-20 w-40 h-40 border border-accent/10 rounded-3xl rotate-12 animate-float" />
       <div className="absolute bottom-40 left-20 w-32 h-32 border border-accent/10 rotate-45 animate-float-delayed" style={{ borderRadius: "30%" }} />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Título */}
+        {/* Header animado */}
         <div className="text-center mb-20">
-          <div 
-            className={`inline-flex items-center gap-2 mb-6 transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
+          <div ref={badgeRef} className="inline-flex items-center gap-2 mb-6">
             <Sparkles className="w-5 h-5 text-accent animate-pulse" />
             <span className="text-sm uppercase tracking-[0.3em] text-accent font-bold">
               Portfolio
@@ -242,21 +492,13 @@ const Projects = () => {
             <Sparkles className="w-5 h-5 text-accent animate-pulse" style={{ animationDelay: "0.5s" }} />
           </div>
           
-          <h2 
-            className={`text-5xl md:text-6xl font-bold mb-6 transition-all duration-700 delay-100 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
-            <span className="bg-gradient-to-r from-text-primary via-accent to-text-primary bg-clip-text text-transparent animate-gradient-x">
+          <h2 ref={titleRef} className="text-5xl md:text-6xl font-bold mb-6" style={{ perspective: '1000px' }}>
+            <span className="bg-gradient-to-r from-text-primary via-accent to-text-primary bg-clip-text text-transparent inline-block">
               Proyectos destacados
             </span>
           </h2>
           
-          <p 
-            className={`text-secondary text-lg max-w-2xl mx-auto mb-8 transition-all duration-700 delay-200 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
+          <p ref={subtitleRef} className="text-secondary text-lg max-w-2xl mx-auto mb-8">
             Soluciones innovadoras construidas con las últimas tecnologías
           </p>
         </div>
@@ -268,19 +510,18 @@ const Projects = () => {
             return (
               <article
                 key={project.title}
-                className={`group relative transition-all duration-700 ${
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-                }`}
-                style={{ transitionDelay: `${index * 0.15}s` }}
+                ref={(el) => (cardsRef.current[index] = el)}
+                className="group relative"
+                style={{ transformStyle: "preserve-3d" }}
                 onMouseEnter={() => setHoveredProject(index)}
                 onMouseLeave={() => setHoveredProject(null)}
               >
-                {/* Card principal con altura fija y flex */}
-                <div className="relative h-full flex flex-col bg-primary border border-border-primary rounded-2xl overflow-hidden transition-all duration-500 hover:border-accent/50 hover:-translate-y-2">
+                {/* Card principal */}
+                <div className="relative h-full flex flex-col bg-primary border border-border-primary rounded-2xl overflow-hidden transition-all duration-500 hover:border-accent/50 hover:shadow-2xl">
                   
-                  {/* Imagen con overlay - altura fija */}
+                  {/* Imagen con lazy loading */}
                   <div className="relative h-56 flex-shrink-0 overflow-hidden">
-                    <img
+                    <LazyImage
                       src={project.image}
                       alt={project.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -289,7 +530,7 @@ const Projects = () => {
                     {/* Overlay con gradiente */}
                     <div className={`absolute inset-0 bg-gradient-to-t ${project.color} opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
                     
-                    {/* Icono flotante */}
+                    {/* Icono flotante animado */}
                     <div className={`absolute top-4 right-4 p-3 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg transition-all duration-500 ${
                       hoveredProject === index ? "scale-100 rotate-0" : "scale-0 rotate-180"
                     }`}>
@@ -300,9 +541,8 @@ const Projects = () => {
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   </div>
 
-                  {/* Contenido - flex grow para ocupar espacio disponible */}
+                  {/* Contenido */}
                   <div className="flex-1 flex flex-col p-6">
-                    {/* Título - altura fija */}
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <h3 className="text-2xl font-bold text-primary group-hover:text-accent transition-colors duration-300 line-clamp-2">
                         {project.title}
@@ -310,30 +550,25 @@ const Projects = () => {
                       <div className={`w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br ${project.color} opacity-20 group-hover:opacity-100 group-hover:scale-125 transition-all duration-500`} />
                     </div>
 
-                    {/* Descripción - altura fija con line-clamp */}
                     <p className="text-secondary leading-relaxed mb-4 line-clamp-3 h-[4.5rem]">
                       {project.description}
                     </p>
 
-                    {/* Tags - altura mínima fija */}
                     <div className="flex flex-wrap gap-2 mb-4 min-h-[3.5rem]">
                       {project.tags.map(tag => (
                         <span 
                           key={tag}
-                          className={`px-3 py-1 text-xs font-medium bg-secondary border border-border-secondary text-tertiary rounded-full transition-all duration-300 hover:border-accent hover:text-accent hover:scale-105 h-fit`}
+                          className="px-3 py-1 text-xs font-medium bg-secondary border border-border-secondary text-tertiary rounded-full transition-all duration-300 hover:border-accent hover:text-accent hover:scale-105 h-fit"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
 
-                    {/* Spacer que empuja los botones al fondo */}
                     <div className="flex-1" />
 
-                    {/* Divider */}
                     <div className="h-px bg-border-primary mb-4" />
 
-                    {/* Botones de acción - siempre en el fondo */}
                     <div className="flex gap-3">
                       <a
                         href={project.demo}
@@ -360,7 +595,7 @@ const Projects = () => {
                   </div>
 
                   {/* Efecto de esquina */}
-                  <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden pointer-events-none">
                     <div className={`absolute top-0 right-0 w-0 h-0 border-t-[50px] border-r-[50px] border-t-transparent transition-all duration-500 ${
                       hoveredProject === index ? "border-r-accent/20" : "border-r-transparent"
                     }`} />
@@ -382,11 +617,7 @@ const Projects = () => {
         </div>
 
         {/* CTA final */}
-        <div 
-          className={`mt-20 text-center transition-all duration-700 delay-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
+        <div className="cta-section mt-20 text-center">
           <p className="text-secondary text-lg mb-6">
             ¿Interesado en trabajar juntos?
           </p>
@@ -401,15 +632,6 @@ const Projects = () => {
       </div>
 
       <style jsx>{`
-        @keyframes gradient-x {
-          0%, 100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-
         @keyframes float {
           0%, 100% {
             transform: translateY(0) rotate(12deg);
@@ -428,9 +650,22 @@ const Projects = () => {
           }
         }
 
-        .animate-gradient-x {
-          background-size: 200% 200%;
-          animation: gradient-x 3s ease infinite;
+        @keyframes float-slow {
+          0%, 100% {
+            transform: translate(0, 0) scale(1);
+          }
+          50% {
+            transform: translate(30px, -30px) scale(1.1);
+          }
+        }
+
+        @keyframes float-slow-delayed {
+          0%, 100% {
+            transform: translate(0, 0) scale(1);
+          }
+          50% {
+            transform: translate(-30px, 30px) scale(1.1);
+          }
         }
 
         .animate-float {
@@ -439,6 +674,14 @@ const Projects = () => {
 
         .animate-float-delayed {
           animation: float-delayed 7s ease-in-out infinite 1s;
+        }
+
+        .animate-float-slow {
+          animation: float-slow 20s ease-in-out infinite;
+        }
+
+        .animate-float-slow-delayed {
+          animation: float-slow-delayed 25s ease-in-out infinite 3s;
         }
       `}</style>
     </section>

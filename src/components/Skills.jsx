@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
 const skills = [
   { 
@@ -44,12 +45,82 @@ const Skills = () => {
   const [hoveredSkill, setHoveredSkill] = useState(null);
   const sectionRef = useRef(null);
   const canvasRef = useRef(null);
+  const skillsContainerRef = useRef(null);
+  const animatedRef = useRef(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !animatedRef.current) {
           setIsVisible(true);
+          animatedRef.current = true;
+          
+          // Animar título con GSAP
+          gsap.from(".skills-subtitle", {
+            opacity: 0,
+            y: 20,
+            duration: 0.6,
+            ease: "power2.out"
+          });
+
+          gsap.from(".skills-title", {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.1,
+            ease: "back.out(1.7)"
+          });
+
+          gsap.from(".skills-divider", {
+            width: 0,
+            opacity: 0,
+            duration: 0.8,
+            delay: 0.2,
+            ease: "power2.inOut"
+          });
+
+          // Animar skill cards con stagger
+          const skillCards = skillsContainerRef.current?.querySelectorAll("[data-skill-card]");
+          if (skillCards) {
+            gsap.from(skillCards, {
+              opacity: 0,
+              y: 40,
+              rotationX: -20,
+              duration: 0.8,
+              stagger: {
+                amount: 0.6,
+                ease: "power2.inOut"
+              },
+              ease: "back.out(1.7)",
+              transformPerspective: 1200
+            });
+          }
+
+          // Animar barras de progreso
+          const progressBars = skillsContainerRef.current?.querySelectorAll("[data-progress-bar]");
+          if (progressBars) {
+            gsap.from(progressBars, {
+              width: "0%",
+              opacity: 0,
+              duration: 1.2,
+              stagger: {
+                amount: 0.8,
+                ease: "power2.inOut"
+              },
+              ease: "power4.out",
+              delay: 0.3
+            });
+          }
+
+          // Animar CTA final
+          gsap.from(".skills-cta", {
+            opacity: 0,
+            y: 30,
+            scale: 0.9,
+            duration: 0.8,
+            delay: 1.2,
+            ease: "back.out(1.7)"
+          });
         }
       },
       { threshold: 0.1 }
@@ -66,17 +137,20 @@ const Skills = () => {
     };
   }, []);
 
-  // Animación de fondo con canvas
+  // Animación de fondo con canvas - OPTIMIZADO
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+    
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
 
     let particles = [];
-    const particleCount = 30;
+    const particleCount = 20; // Reducido para mejor performance
+    let frameCount = 0;
 
     class Particle {
       constructor() {
@@ -86,10 +160,10 @@ const Skills = () => {
       reset() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 3 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
-        this.opacity = Math.random() * 0.3;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.opacity = Math.random() * 0.25;
       }
 
       update() {
@@ -112,13 +186,20 @@ const Skills = () => {
       particles.push(new Particle());
     }
 
+    let animationId = null;
     function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animate);
+      frameCount++;
+      
+      // Actualizar solo cada 2 frames para mejor performance
+      if (frameCount % 2 === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+      }
+      
+      animationId = requestAnimationFrame(animate);
     }
 
     animate();
@@ -129,7 +210,10 @@ const Skills = () => {
     };
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (animationId) cancelAnimationFrame(animationId);
+    };
   }, []);
 
   return (
@@ -151,44 +235,30 @@ const Skills = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Título */}
         <div className="text-center mb-20">
-          <div 
-            className={`inline-block mb-4 transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
+          <div className="skills-subtitle inline-block mb-4">
             <span className="text-sm uppercase tracking-widest text-accent font-semibold">
               Stack Tecnológico
             </span>
           </div>
           
-          <h2 
-            className={`text-4xl md:text-5xl font-bold text-primary mb-6 transition-all duration-700 delay-100 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
+          <h2 className="skills-title text-4xl md:text-5xl font-bold text-primary mb-6">
             Habilidades técnicas
           </h2>
           
-          <div 
-            className={`w-24 h-1 bg-gradient-to-r from-transparent via-accent to-transparent mx-auto transition-all duration-700 delay-200 ${
-              isVisible ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
-            }`}
-          />
+          <div className="skills-divider w-24 h-1 bg-gradient-to-r from-transparent via-accent to-transparent mx-auto" />
         </div>
 
         {/* Skills Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div ref={skillsContainerRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {skills.map((skill, index) => (
             <div
               key={skill.name}
-              className={`transition-all duration-700 ${
-                isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
-              }`}
-              style={{ transitionDelay: `${index * 0.1}s` }}
+              data-skill-card
               onMouseEnter={() => setHoveredSkill(skill.name)}
               onMouseLeave={() => setHoveredSkill(null)}
+              className="group will-change-transform"
             >
-              <div className="group relative">
+              <div className="relative">
                 {/* Fondo con efecto de brillo */}
                 <div className={`absolute -inset-1 bg-gradient-to-r ${skill.color} rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500`} />
                 
@@ -199,7 +269,7 @@ const Skills = () => {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       {/* Icono decorativo */}
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${skill.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${skill.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 will-change-transform`}>
                         <span className="text-white font-bold text-lg">
                           {skill.icon === "html" && "H"}
                           {skill.icon === "css" && "C"}
@@ -221,7 +291,7 @@ const Skills = () => {
                     </div>
 
                     {/* Porcentaje grande */}
-                    <div className={`text-3xl font-bold bg-gradient-to-r ${skill.color} bg-clip-text text-transparent transition-all duration-300 ${
+                    <div className={`text-3xl font-bold bg-gradient-to-r ${skill.color} bg-clip-text text-transparent transition-all duration-300 will-change-transform ${
                       hoveredSkill === skill.name ? "scale-125" : "scale-100"
                     }`}>
                       {skill.level}
@@ -235,13 +305,10 @@ const Skills = () => {
                     
                     {/* Barra de progreso con gradiente */}
                     <div 
-                      className={`h-full bg-gradient-to-r ${skill.color} rounded-full transition-all duration-1000 ease-out relative overflow-hidden ${
-                        isVisible ? "scale-x-100" : "scale-x-0"
-                      }`}
+                      data-progress-bar
+                      className={`h-full bg-gradient-to-r ${skill.color} rounded-full relative overflow-hidden`}
                       style={{ 
                         width: `${skill.level}%`,
-                        transformOrigin: "left",
-                        transitionDelay: `${index * 0.1 + 0.3}s`
                       }}
                     >
                       {/* Efecto de brillo en la barra */}
@@ -269,17 +336,13 @@ const Skills = () => {
         </div>
 
         {/* CTA Section */}
-        <div 
-          className={`mt-20 text-center transition-all duration-700 delay-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
+        <div className="skills-cta mt-20 text-center">
           <p className="text-secondary text-lg mb-6">
             Siempre aprendiendo y mejorando mis habilidades
           </p>
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-secondary border border-accent/50 rounded-full text-accent font-medium hover:bg-accent hover:text-white transition-all duration-300 hover:scale-105">
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-secondary border border-accent/50 rounded-full text-accent font-medium hover:bg-accent hover:text-white transition-all duration-300 hover:scale-105 cursor-pointer group will-change-transform">
             <span>En constante evolución</span>
-            <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 group-hover:translate-y-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
           </div>

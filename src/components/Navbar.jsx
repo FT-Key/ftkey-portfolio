@@ -131,15 +131,15 @@ const Navbar = () => {
     <nav 
       className={`sticky top-0 left-0 w-full z-50 transition-all duration-500 px-4 ${
         scrolled 
-          ? "py-3" 
-          : "py-5"
+          ? "py-5" 
+          : "py-8"
       }`}
     >
       {/* Glassmorphism background */}
       <div 
         className={`absolute inset-0 bg-primary/70 backdrop-blur-xl border border-border-primary/50 transition-all duration-500 ${
           scrolled 
-            ? "mx-4 my-2 rounded-2xl shadow-lg shadow-accent/5"
+            ? "mx-36 my-2 rounded-2xl shadow-lg shadow-accent/5"
             : "mx-0 my-0 rounded-none border-b border-t-0 border-x-0"
         }`}
         style={{
@@ -299,7 +299,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes fade-in {
           from {
             opacity: 0;
