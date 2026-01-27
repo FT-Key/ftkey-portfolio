@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Layers, Zap, Code2, Sparkles } from "lucide-react";
-import gsap from "gsap";
 
 const features = [
   {
@@ -34,89 +33,12 @@ const About = () => {
   const [activeCard, setActiveCard] = useState(null);
   const sectionRef = useRef(null);
   const canvasRefs = useRef([]);
-  const featureCardsRef = useRef([]);
-  const animatedRef = useRef(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !animatedRef.current) {
+        if (entry.isIntersecting) {
           setIsVisible(true);
-          animatedRef.current = true;
-
-          // Animar título
-          gsap.from(".about-label", {
-            opacity: 0,
-            y: -20,
-            duration: 0.6,
-            ease: "power2.out"
-          });
-
-          gsap.from(".about-title", {
-            opacity: 0,
-            y: 30,
-            duration: 0.8,
-            delay: 0.1,
-            ease: "back.out(1.7)"
-          });
-
-          gsap.from(".about-subtitle", {
-            opacity: 0,
-            y: 20,
-            duration: 0.7,
-            delay: 0.2,
-            ease: "power2.out"
-          });
-
-          gsap.from(".about-divider", {
-            opacity: 0,
-            scale: 0,
-            duration: 0.6,
-            delay: 0.3,
-            ease: "back.out(1.7)"
-          });
-
-          // Animar feature cards con stagger
-          const cards = featureCardsRef.current;
-          if (cards.length > 0) {
-            gsap.from(cards, {
-              opacity: 0,
-              y: 50,
-              rotationX: -15,
-              duration: 0.9,
-              stagger: {
-                amount: 0.4,
-                ease: "power2.inOut"
-              },
-              ease: "back.out(1.7)",
-              transformPerspective: 1200,
-              delay: 0.4
-            });
-          }
-
-          // Animar stats section
-          gsap.from(".about-stats", {
-            opacity: 0,
-            y: 40,
-            scale: 0.95,
-            duration: 0.8,
-            delay: 1,
-            ease: "back.out(1.7)"
-          });
-
-          // Animar el círculo de progreso
-          const circles = document.querySelectorAll(".progress-circle");
-          circles.forEach((circle) => {
-            const totalLength = circle.getTotalLength ? circle.getTotalLength() : 0;
-            if (totalLength > 0) {
-              gsap.from(circle, {
-                strokeDashoffset: totalLength,
-                duration: 2,
-                delay: 1.2,
-                ease: "power4.out"
-              });
-            }
-          });
         }
       },
       { threshold: 0.1 }
@@ -133,14 +55,12 @@ const About = () => {
     };
   }, []);
 
-  // Animación de partículas para cada card - OPTIMIZADO
+  // Animación de partículas para cada card
   useEffect(() => {
     const animations = canvasRefs.current.map((canvas, idx) => {
       if (!canvas) return null;
 
-      const ctx = canvas.getContext("2d", { alpha: true });
-      if (!ctx) return null;
-
+      const ctx = canvas.getContext("2d");
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width;
       canvas.height = rect.height;
@@ -156,10 +76,10 @@ const About = () => {
         reset() {
           this.x = Math.random() * canvas.width;
           this.y = Math.random() * canvas.height;
-          this.vx = (Math.random() - 0.5) * 0.2;
-          this.vy = (Math.random() - 0.5) * 0.2;
-          this.radius = Math.random() * 1.5 + 0.3;
-          this.opacity = Math.random() * 0.3 + 0.1;
+          this.vx = (Math.random() - 0.5) * 0.3;
+          this.vy = (Math.random() - 0.5) * 0.3;
+          this.radius = Math.random() * 2 + 0.5;
+          this.opacity = Math.random() * 0.4 + 0.1;
         }
 
         update() {
@@ -187,41 +107,33 @@ const About = () => {
         particles.push(new Particle());
       }
 
-      let frameCount = 0;
       let animationId;
       function animate() {
-        frameCount++;
-        
-        // Actualizar partículas cada 2 frames para mejor performance
-        if (frameCount % 2 === 0) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          particles.forEach((particle) => {
-            particle.update();
-            particle.draw();
-          });
+        particles.forEach((particle) => {
+          particle.update();
+          particle.draw();
+        });
 
-          // Conectar partículas cercanas - optimizado
-          for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-              const dx = particles[i].x - particles[j].x;
-              const dy = particles[i].y - particles[j].y;
-              const distSq = dx * dx + dy * dy;
-              const maxDist = 80;
+        // Conectar partículas cercanas
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-              if (distSq < maxDist * maxDist) {
-                const distance = Math.sqrt(distSq);
-                ctx.beginPath();
-                
-                if (idx === 0) ctx.strokeStyle = `rgba(59, 130, 246, ${0.1 * (1 - distance / maxDist)})`;
-                if (idx === 1) ctx.strokeStyle = `rgba(168, 85, 247, ${0.1 * (1 - distance / maxDist)})`;
-                if (idx === 2) ctx.strokeStyle = `rgba(249, 115, 22, ${0.1 * (1 - distance / maxDist)})`;
-                
-                ctx.lineWidth = 0.5;
-                ctx.moveTo(particles[i].x, particles[i].y);
-                ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.stroke();
-              }
+            if (distance < 80) {
+              ctx.beginPath();
+              
+              if (idx === 0) ctx.strokeStyle = `rgba(59, 130, 246, ${0.15 * (1 - distance / 80)})`;
+              if (idx === 1) ctx.strokeStyle = `rgba(168, 85, 247, ${0.15 * (1 - distance / 80)})`;
+              if (idx === 2) ctx.strokeStyle = `rgba(249, 115, 22, ${0.15 * (1 - distance / 80)})`;
+              
+              ctx.lineWidth = 0.5;
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
             }
           }
         }
@@ -272,27 +184,43 @@ const About = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Título con efectos mejorados */}
         <div className="text-center mb-24">
-          <div className="about-label inline-flex items-center gap-2 mb-6">
-            <Sparkles className="w-5 h-5 text-accent" />
+          <div 
+            className={`inline-flex items-center gap-2 mb-6 transition-all duration-700 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
+            <Sparkles className="w-5 h-5 text-accent animate-pulse" />
             <span className="text-sm uppercase tracking-[0.3em] text-accent font-bold">
               Sobre mí
             </span>
-            <Sparkles className="w-5 h-5 text-accent" />
+            <Sparkles className="w-5 h-5 text-accent animate-pulse" style={{ animationDelay: "0.5s" }} />
           </div>
           
-          <h2 className="about-title text-5xl md:text-6xl font-bold mb-6">
+          <h2 
+            className={`text-5xl md:text-6xl font-bold mb-6 transition-all duration-700 delay-100 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
             <span className="bg-gradient-to-r from-text-primary via-accent to-text-primary bg-clip-text text-transparent animate-gradient-x">
               Mi enfoque de desarrollo
             </span>
           </h2>
           
-          <p className="about-subtitle text-secondary text-lg max-w-2xl mx-auto mb-8">
+          <p 
+            className={`text-secondary text-lg max-w-2xl mx-auto mb-8 transition-all duration-700 delay-200 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
             Combino creatividad y código para construir experiencias web excepcionales
           </p>
           
-          <div className="about-divider flex items-center justify-center gap-4">
+          <div 
+            className={`flex items-center justify-center gap-4 transition-all duration-700 delay-300 ${
+              isVisible ? "opacity-100 scale-100" : "opacity-0 scale-0"
+            }`}
+          >
             <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent" />
-            <div className="w-2 h-2 rounded-full bg-accent" />
+            <div className="w-2 h-2 rounded-full bg-accent animate-ping" />
             <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent" />
           </div>
         </div>
@@ -304,8 +232,10 @@ const About = () => {
             return (
               <div
                 key={item.title}
-                ref={el => featureCardsRef.current[index] = el}
-                className="group relative will-change-transform"
+                className={`group relative transition-all duration-700 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+                }`}
+                style={{ transitionDelay: item.delay }}
                 onMouseEnter={() => setActiveCard(index)}
                 onMouseLeave={() => setActiveCard(null)}
               >
@@ -319,7 +249,7 @@ const About = () => {
 
                   {/* Background con clip-path único */}
                   <div 
-                    className="absolute inset-0 bg-primary border border-border-primary transition-all duration-500 group-hover:border-accent/50 will-change-transform"
+                    className="absolute inset-0 bg-primary border border-border-primary transition-all duration-500 group-hover:border-accent/50"
                     style={{
                       clipPath: activeCard === index 
                         ? "polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%)"
@@ -343,7 +273,7 @@ const About = () => {
                   <div className="relative z-10 p-8 h-full flex flex-col">
                     {/* Icono con animación avanzada */}
                     <div className="mb-8 relative">
-                      <div className={`inline-flex p-5 rounded-2xl bg-gradient-to-br ${item.color} shadow-xl transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 will-change-transform`}>
+                      <div className={`inline-flex p-5 rounded-2xl bg-gradient-to-br ${item.color} shadow-xl transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6`}>
                         <Icon className="w-8 h-8 text-white" strokeWidth={2.5} />
                       </div>
                       
@@ -407,7 +337,11 @@ const About = () => {
         </div>
 
         {/* Estadística final con diseño mejorado */}
-        <div className="about-stats relative">
+        <div 
+          className={`relative transition-all duration-700 delay-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
           <div className="max-w-4xl mx-auto">
             <div className="relative bg-gradient-to-br from-primary to-secondary border border-border-primary rounded-3xl p-12 overflow-hidden">
               {/* Patrón de fondo */}
@@ -436,7 +370,7 @@ const About = () => {
 
                 {/* Visualización circular */}
                 <div className="relative">
-                  <svg className="w-40 h-40 transform -rotate-90 will-change-transform">
+                  <svg className="w-40 h-40 transform -rotate-90">
                     <circle
                       cx="80"
                       cy="80"
@@ -453,11 +387,8 @@ const About = () => {
                       strokeWidth="8"
                       fill="none"
                       strokeDasharray={`${2 * Math.PI * 70}`}
-                      strokeDashoffset={2 * Math.PI * 70}
-                      className="progress-circle"
-                      style={{
-                        transition: "stroke-dashoffset 2s ease-out"
-                      }}
+                      strokeDashoffset={0}
+                      className="animate-draw-circle"
                     />
                     <defs>
                       <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -467,7 +398,7 @@ const About = () => {
                     </defs>
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Sparkles className="w-12 h-12 text-accent" />
+                    <Sparkles className="w-12 h-12 text-accent animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -480,7 +411,7 @@ const About = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes gradient-x {
           0%, 100% {
             background-position: 0% 50%;
