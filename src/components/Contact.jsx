@@ -144,10 +144,10 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email",
-      value: "franco@email.com",
+      value: "fr4nc0t2@gmail.com",
       description: "Respuesta en 24-48 horas",
       color: "from-blue-500 to-cyan-500",
-      action: "mailto:franco@email.com"
+      action: "mailto:fr4nc0t2@gmail.com"
     },
     {
       icon: Github,
@@ -163,7 +163,7 @@ const Contact = () => {
       value: "Franco Toledo",
       description: "Conectemos profesionalmente",
       color: "from-blue-600 to-blue-800",
-      action: "https://linkedin.com"
+      action: "https://www.linkedin.com/in/ftkey/"
     }
   ];
 
@@ -370,7 +370,7 @@ const Contact = () => {
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <a
-                    href="mailto:franco@email.com"
+                    href="mailto:fr4nc0t2@gmail.com"
                     className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white text-accent font-medium rounded-lg hover:scale-105 transition-transform duration-300"
                   >
                     <Mail className="w-5 h-5" />
@@ -413,7 +413,7 @@ const Contact = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes gradient-x {
           0%, 100% {
             background-position: 0% 50%;
