@@ -160,7 +160,7 @@ const Navbar = () => {
   return (
     <nav className={`sticky top-0 left-0 w-full z-50 transition-all duration-500 px-4 ${scrolled ? "py-5" : "py-8"}`}>
       <div className={`absolute inset-0 bg-primary/70 backdrop-blur-xl border border-border-primary/50 transition-all duration-500 ${
-        scrolled ? "mx-36 my-2 rounded-2xl shadow-lg shadow-accent/5" : "mx-0 my-0 rounded-none border-b border-t-0 border-x-0"
+        scrolled ? "mx-auto max-w-[1400px] my-2 rounded-2xl shadow-lg shadow-accent/5" : "mx-0 my-0 rounded-none border-b border-t-0 border-x-0"
       }`} />
 
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-40 pointer-events-none" />
@@ -176,7 +176,7 @@ const Navbar = () => {
             <div className="relative flex items-center gap-2">
               <div className={`transition-all duration-500 ${scrolled ? "text-2xl" : "text-3xl"} font-black tracking-tight`}>
                 <span className="text-primary">FT</span>
-                <span className="bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent">Key</span>
+                <span className="bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-accent">Key</span>
               </div>
               <Sparkles className={`text-accent transition-all duration-500 ${scrolled ? "w-4 h-4" : "w-5 h-5"} animate-pulse`} />
             </div>
