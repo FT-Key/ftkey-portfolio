@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Layers, Zap, Code2, Sparkles } from "lucide-react";
+import { Layers, Zap, Code2, Sparkles, Search, TrendingUp } from "lucide-react";
 
 const features = [
   {
@@ -9,6 +9,14 @@ const features = [
     color: "from-blue-500 to-cyan-500",
     delay: "0.1s",
     particles: 15
+  },
+  {
+    icon: Search,
+    title: "SEO Estratégico",
+    text: "Domino la optimización para motores de búsqueda: arquitectura de información, rendimiento Core Web Vitals, metadatos semánticos y SSR/SSG para maximizar visibilidad orgánica.",
+    color: "from-green-500 to-emerald-500",
+    delay: "0.15s",
+    particles: 14
   },
   {
     icon: Zap,
@@ -25,6 +33,14 @@ const features = [
     color: "from-orange-500 to-red-500",
     delay: "0.3s",
     particles: 18
+  },
+  {
+    icon: TrendingUp,
+    title: "Liderazgo técnico",
+    text: "Capacidad para liderar equipos de desarrollo, tomar decisiones arquitectónicas y mentorizar desarrolladores junior. Experiencia en code reviews, planificación de sprints y delivery continuo.",
+    color: "from-rose-500 to-pink-600",
+    delay: "0.35s",
+    particles: 16
   },
 ];
 
@@ -94,10 +110,14 @@ const About = () => {
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
           
-          // Color según el feature
-          if (idx === 0) ctx.fillStyle = `rgba(59, 130, 246, ${this.opacity})`;
-          if (idx === 1) ctx.fillStyle = `rgba(168, 85, 247, ${this.opacity})`;
-          if (idx === 2) ctx.fillStyle = `rgba(249, 115, 22, ${this.opacity})`;
+          const colors = [
+            "rgba(59, 130, 246, ",   // 0 - Estructurado
+            "rgba(16, 185, 129, ",   // 1 - SEO
+            "rgba(168, 85, 247, ",   // 2 - Reactivo
+            "rgba(249, 115, 22, ",   // 3 - Código limpio
+            "rgba(225, 29, 72, ",    // 4 - Liderazgo
+          ];
+          ctx.fillStyle = `${colors[idx] || colors[0]}${this.opacity})`;
           
           ctx.fill();
         }
@@ -126,9 +146,14 @@ const About = () => {
             if (distance < 80) {
               ctx.beginPath();
               
-              if (idx === 0) ctx.strokeStyle = `rgba(59, 130, 246, ${0.15 * (1 - distance / 80)})`;
-              if (idx === 1) ctx.strokeStyle = `rgba(168, 85, 247, ${0.15 * (1 - distance / 80)})`;
-              if (idx === 2) ctx.strokeStyle = `rgba(249, 115, 22, ${0.15 * (1 - distance / 80)})`;
+              const strokeColors = [
+                "rgba(59, 130, 246, ",   // 0 - Estructurado
+                "rgba(16, 185, 129, ",   // 1 - SEO
+                "rgba(168, 85, 247, ",   // 2 - Reactivo
+                "rgba(249, 115, 22, ",   // 3 - Código limpio
+                "rgba(225, 29, 72, ",    // 4 - Liderazgo
+              ];
+              ctx.strokeStyle = `${strokeColors[idx] || strokeColors[0]}${0.15 * (1 - distance / 80)})`;
               
               ctx.lineWidth = 0.5;
               ctx.moveTo(particles[i].x, particles[i].y);
@@ -211,7 +236,7 @@ const About = () => {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
-            Combino creatividad y código para construir experiencias web excepcionales
+            Desarrollo web full-stack + SEO estratégico + liderazgo técnico para crear productos digitales completos
           </p>
           
           <div 
@@ -279,9 +304,9 @@ const About = () => {
                       
                       {/* Anillos decorativos */}
                       <div className={`absolute -top-2 -right-2 w-16 h-16 rounded-full border-2 border-dashed opacity-0 group-hover:opacity-30 transition-all duration-500 animate-spin-slow`}
-                        style={{
-                          borderColor: index === 0 ? "#3b82f6" : index === 1 ? "#a855f7" : "#f97316"
-                        }}
+                          style={{
+                            borderColor: ["#3b82f6", "#10b981", "#a855f7", "#f97316", "#e11d48"][index] || "#3b82f6"
+                          }}
                       />
                       <div className={`absolute -bottom-2 -left-2 w-12 h-12 rounded-full bg-gradient-to-br ${item.color} opacity-20 blur-xl group-hover:scale-150 transition-transform duration-500`} />
                     </div>

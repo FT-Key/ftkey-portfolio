@@ -63,7 +63,7 @@ const projects = [
     description: "E-commerce de paquetes turísticos con integración de MercadoPago y gestión de reservas.",
     image: ravelloImg,
     github: "https://github.com/FT-Key/Ravello-web",
-    demo: "https://ravello.netlify.app/",
+    demo: "https://ravello-turismo.com",
     tags: ["NextJS", "Firebase", "TailwindCSS", "eCommerce", "MercadoPago", "Business"],
     color: "from-emerald-500 to-teal-600",
     icon: Database

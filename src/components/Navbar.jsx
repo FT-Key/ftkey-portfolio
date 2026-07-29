@@ -13,9 +13,10 @@ const Navbar = () => {
   const links = useMemo(
     () => [
       { label: "Inicio", href: "#inicio" },
+      { label: "Proyectos", href: "#proyectos" },
+      { label: "Comunidad", href: "#comunidad" },
       { label: "Sobre mí", href: "#sobreMi" },
       { label: "Habilidades", href: "#habilidades" },
-      { label: "Proyectos", href: "#proyectos" },
       { label: "Contacto", href: "#contacto" },
     ],
     []
